@@ -1,0 +1,10 @@
+[package]
+name = "bvid"
+version = "1.0.0"
+edition = "2021"
+authors = ["stackinspector"]
+license = "MIT"
+repository = "https://github.com/stackinspector/bvid"
+
+[lib]
+path = "lib.rs"
