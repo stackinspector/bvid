@@ -8,3 +8,6 @@ repository = "https://github.com/stackinspector/bvid"
 
 [lib]
 path = "lib.rs"
+
+[features]
+arraystr = []
