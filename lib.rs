@@ -1,6 +1,7 @@
 #![no_std]
 
-const BVID_LEN: usize = 10;
+pub const VAILD_AVID_MAX: u64 = 29460791296;
+pub const BVID_LEN: usize = 10;
 const XORN: u64 = 177451812;
 const ADDN: u64 = 100618342136696320;
 const TABLE: [u8; 58] = *b"fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF";
@@ -16,21 +17,30 @@ const POW58: [u64; BVID_LEN] = [
     2207984167552, 128063081718016, 7427658739644928,
 ];
 
-pub fn av2bv(avid: u64) -> [u8; BVID_LEN] {
-    let a = (avid ^ XORN) + ADDN;
-    let mut bvid = [0; BVID_LEN];
-    for i in 0..BVID_LEN {
-        bvid[MAP[i]] = TABLE[(a / POW58[i]) as usize % 58];
+pub fn av2bv(avid: u64) -> Option<[u8; BVID_LEN]> {
+    if avid >= VAILD_AVID_MAX {
+        None
+    } else {
+        let a = (avid ^ XORN) + ADDN;
+        let mut bvid = [0; BVID_LEN];
+        for i in 0..BVID_LEN {
+            bvid[MAP[i]] = TABLE[(a / POW58[i]) as usize % 58];
+        }
+        Some(bvid)
     }
-    bvid
 }
 
-pub fn bv2av(bvid: [u8; BVID_LEN]) -> u64 {
+pub fn bv2av(bvid: [u8; BVID_LEN]) -> Option<u64> {
     let mut a = 0;
     for i in 0..BVID_LEN {
         a += REV_TABLE[bvid[MAP[i]] as usize - 49] as u64 * POW58[i];
     }
-    (a - ADDN) ^ XORN
+    let avid = (a - ADDN) ^ XORN;
+    if avid >= VAILD_AVID_MAX {
+        None
+    } else {
+        Some(avid)
+    }
 }
 
 #[cfg(feature = "arraystr")]
@@ -66,8 +76,8 @@ mod tests {
 
     macro_rules! cases {
         ($($avid:literal -> $bvid:literal)*) => {$(
-            assert_eq!(*$bvid, av2bv($avid));
-            assert_eq!($avid, bv2av(*$bvid));
+            assert_eq!(*$bvid, av2bv($avid).unwrap());
+            assert_eq!($avid, bv2av(*$bvid).unwrap());
         )*};
     }
 

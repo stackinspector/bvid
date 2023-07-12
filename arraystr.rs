@@ -83,12 +83,12 @@ impl core::fmt::Display for Bvid {
 
 impl Bvid {
     #[inline(always)]
-    pub fn from_avid(avid: u64) -> Bvid {
-        Bvid(av2bv(avid))
+    pub fn from_avid(avid: u64) -> Option<Bvid> {
+        Some(Bvid(av2bv(avid)?))
     }
 
     #[inline(always)]
-    pub fn to_avid(self) -> u64 {
+    pub fn to_avid(self) -> Option<u64> {
         bv2av(self.0)
     }
 }
